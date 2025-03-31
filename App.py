@@ -4,7 +4,7 @@ import pyrebase
 from firebase_admin import credentials , firestore ,auth
 app = Flask(__name__)
 cred = credentials.Certificate(
-    "C:/Users/pc/Desktop/Flaskapp/graduation-project-d3c73-firebase-adminsdk-fbsvc-e305fc32c1.json"
+    "E:\Back-end\graduation-project-d3c73-firebase-adminsdk-fbsvc-e305fc32c1.json"
     )
 firebase_admin.initialize_app(cred)
 db = firestore.client() 
@@ -56,4 +56,4 @@ def login_user():
 
 
 if __name__=="__main__":
-    app.run(debug=True)
+    app.run(host = "0.0.0.0" , port= 5000)
