@@ -30,9 +30,9 @@ class User(db.Model):
 
 @app.route('/test', methods=['POST'])
 def test():
-    data =12
+    user = User.query.get(9)
     
-    return jsonify({"message": data}), 200
+    return jsonify({"message": user.name}), 200
 
 # API Endpoints
 
@@ -152,22 +152,22 @@ def update_profile(user_id):
     if not user:
         return jsonify({'message': 'User not found'}), 404
 
-    if data['name'] != None:
+    if data.get('name'):
         user.name = data['name']
 
-    if data['email'] != None:
+    if data.get('email'):
         user.email = data['email']
 
-    if data['age'] != None:
-        user.age = data['age']
+    if data.get('age'):
+        user.age = int(data['age'])
 
-    if data['height'] != None:
-        user.height = data['height']
+    if data.get('height'):
+        user.height = int(data['height'])
 
-    if data['weight'] != None:
-        user.weight = data['weight']
+    if data.get('weight'):
+        user.weight = int(data['weight'])
 
-    if data['gender'] != None:
+    if data.get('gender'):
         user.gender = data['gender']
 
     # Recalculate BMI if height and weight are updated
