@@ -26,6 +26,7 @@ class User(db.Model):
     gender = db.Column(db.String(20))
     bmr = db.Column(db.Numeric(10, 2))
     bmi = db.Column(db.Numeric(5, 2))
+    loged_in =db.Column(db.Boolean, default=False)
 
 
 @app.route('/test', methods=['POST'])
@@ -49,6 +50,7 @@ def register():
         return jsonify({'message': 'User already exists'}), 409
 
     hashed_password = generate_password_hash(data['password'], method='pbkdf2:sha256')
+    loged_in = True
 
     # Calculate BMI if height and weight are provided
     bmi = None
@@ -78,7 +80,8 @@ def register():
         weight=data.get('weight'),
         gender=data.get('gender'),
         bmi=bmi,
-        bmr=bmr
+        bmr=bmr,
+        loged_in =loged_in
     )
 
     db.session.add(new_user)
@@ -94,7 +97,8 @@ def login():
     
     if not user or not check_password_hash(user.password, data['password']):
         return jsonify({'message': 'Invalid credentials'}), 401
-    
+    user.loged_in = True
+    db.session.commit()
     return jsonify({
         'message': 'Login successful',
         'user_id': user.user_id,
@@ -137,8 +141,7 @@ def change_password(user_id):
 
     user.password = generate_password_hash(data['new_password'], method='pbkdf2:sha256')
     db.session.commit()
-    # user.password = generate_password_hash(data['new_password'], method='sha256')
-    # db.session.commit()
+
 
     return jsonify({'message': 'Password updated successfully'}), 200
 
@@ -191,6 +194,17 @@ def update_profile(user_id):
 
     return jsonify({'message': 'Profile updated successfully'}), 200
 
+## 6. User Logout
+@app.route('/api/logout/<int:user_id>', methods=['POST'])
+def logout(user_id):
+    data= request.form.to_dict()
+    jsonify(data)
+    user = User.query.get(user_id)
+    user.loged_in = False
+    db.session.commit()
+
+
+    return jsonify({'message': 'Loged out successfully'}), 200
 
 
 # Run the application
