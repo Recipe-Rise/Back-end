@@ -26,7 +26,7 @@ class User(db.Model):
     gender = db.Column(db.String(20))
     bmr = db.Column(db.Numeric(10, 2))
     bmi = db.Column(db.Numeric(5, 2))
-    loged_in =db.Column(db.Boolean, default=False)
+    logged_in =db.Column(db.Boolean, default=False)
 
 
 @app.route('/test', methods=['POST'])
@@ -81,7 +81,7 @@ def register():
         gender=data.get('gender'),
         bmi=bmi,
         bmr=bmr,
-        loged_in =loged_in
+        logged_in =logged_in
     )
 
     db.session.add(new_user)
@@ -97,7 +97,10 @@ def login():
     
     if not user or not check_password_hash(user.password, data['password']):
         return jsonify({'message': 'Invalid credentials'}), 401
-    user.loged_in = True
+    if not user.logged_in :
+        return jsonify({'message': 'user logged in on another device'}), 403
+
+    user.logged_in = True
     db.session.commit()
     return jsonify({
         'message': 'Login successful',
@@ -200,11 +203,11 @@ def logout(user_id):
     data= request.form.to_dict()
     jsonify(data)
     user = User.query.get(user_id)
-    user.loged_in = False
+    user.logged_in = False
     db.session.commit()
 
 
-    return jsonify({'message': 'Loged out successfully'}), 200
+    return jsonify({'message': 'Logged out successfully'}), 200
 
 
 # Run the application
