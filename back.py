@@ -50,7 +50,7 @@ def register():
         return jsonify({'message': 'User already exists'}), 409
 
     hashed_password = generate_password_hash(data['password'], method='pbkdf2:sha256')
-    loged_in = True
+    logged_in = True
 
     # Calculate BMI if height and weight are provided
     bmi = None
@@ -86,7 +86,20 @@ def register():
 
     db.session.add(new_user)
     db.session.commit()
-    return jsonify({'message': 'User registered successfully'}), 201
+
+    return jsonify({
+        'message': 'User registered successfully',
+        'user_id': new_user.user_id,
+        'name': new_user.name,
+        'email': new_user.email,
+        'age': new_user.age,
+        'height': str(new_user.height),
+        'weight': str(new_user.weight),
+        'gender': new_user.gender,
+        'bmr': str(new_user.bmr),
+        'bmi': str(new_user.bmi)
+    }), 201
+
 
 ## 2. User Login
 @app.route('/api/login', methods=['POST'])
@@ -97,7 +110,7 @@ def login():
     
     if not user or not check_password_hash(user.password, data['password']):
         return jsonify({'message': 'Invalid credentials'}), 401
-    if not user.logged_in :
+    if user.logged_in :
         return jsonify({'message': 'user logged in on another device'}), 403
 
     user.logged_in = True
