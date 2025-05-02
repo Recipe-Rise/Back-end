@@ -2,7 +2,9 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy import text
+import json
+from ML_Model.ml_model import init_model , find_similar_recipe ,input_and_execution
+from ML_Model.utils import calculate_tdee
 
 app = Flask(__name__)
 CORS(app)
@@ -12,7 +14,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123@localhost/Rec
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-
+df, model = init_model()
 # Database Model
 class User(db.Model):
     __tablename__ = 'user'
@@ -20,13 +22,14 @@ class User(db.Model):
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
-    age = db.Column(db.Integer)
-    height = db.Column(db.Numeric(5, 2))
-    weight = db.Column(db.Numeric(5, 2))
-    gender = db.Column(db.String(20))
+    age = db.Column(db.Integer, nullable=False)
+    height = db.Column(db.Numeric(5, 2), nullable=False)
+    weight = db.Column(db.Numeric(5, 2), nullable=False)
+    gender = db.Column(db.String(20), nullable=False)
     bmr = db.Column(db.Numeric(10, 2))
     bmi = db.Column(db.Numeric(5, 2))
     logged_in =db.Column(db.Boolean, default=False)
+    activity_level = db.Column(db.String(20), nullable=False)
 
 
 @app.route('/test', methods=['POST'])
@@ -81,7 +84,8 @@ def register():
         gender=data.get('gender'),
         bmi=bmi,
         bmr=bmr,
-        logged_in =logged_in
+        logged_in =logged_in,
+        activity_level=data["activity_level"]
     )
 
     db.session.add(new_user)
@@ -97,7 +101,8 @@ def register():
         'weight': str(new_user.weight),
         'gender': new_user.gender,
         'bmr': str(new_user.bmr),
-        'bmi': str(new_user.bmi)
+        'bmi': str(new_user.bmi),
+        "activity_level": new_user.activity_level
     }), 201
 
 
@@ -139,7 +144,8 @@ def get_user_profile(user_id):
         'weight': str(user.weight),
         'gender': user.gender,
         'bmr': str(user.bmr),
-        'bmi': str(user.bmi)
+        'bmi': str(user.bmi),
+        "activity_level": user.activity_level,
     }), 200
 
 ## 4. Change Password
@@ -173,6 +179,9 @@ def update_profile(user_id):
 
     if data.get('name'):
         user.name = data['name']
+
+    if data.get('activity_level'):
+        user.activity_level = data['activity_level']
 
     if data.get('email'):
         user.email = data['email']
@@ -213,14 +222,73 @@ def update_profile(user_id):
 ## 6. User Logout
 @app.route('/api/logout/<int:user_id>', methods=['POST'])
 def logout(user_id):
-    data= request.form.to_dict()
-    jsonify(data)
     user = User.query.get(user_id)
     user.logged_in = False
     db.session.commit()
 
 
     return jsonify({'message': 'Logged out successfully'}), 200
+
+## 6. Recommendation system
+@app.route('/ml_model/<int:user_id>', methods=['GET'])
+def ml_model(user_id):
+    user = User.query.get(user_id)
+    data= request.form.to_dict()
+    jsonify(data)
+    temp_df = input_and_execution(data["recipe_description"],df , model)
+
+    find_similar_recipe_parameters ={
+        "num_recipes":3,
+        "min_calories":300,
+        "max_calories":1000,
+        "diabetic_friendly":False,
+        "max_prep_time":60,
+        "fitness_goal":None,
+
+    }
+    if data.get('num_recipes'):
+        find_similar_recipe_parameters["num_recipes"] = int(data["num_recipes"])
+
+    if data.get('min_calories'):
+        find_similar_recipe_parameters["min_calories"] =int (data["min_calories"])
+
+    if data.get('max_calories'):
+        find_similar_recipe_parameters["max_calories"] = int(data["max_calories"])
+
+    if data.get('diabetic_friendly'):
+        find_similar_recipe_parameters["diabetic_friendly"] = bool(data["diabetic_friendly"])
+
+    if data.get('max_prep_time'):
+        find_similar_recipe_parameters["max_prep_time"] = int(data["max_prep_time"])
+
+    if data.get('fitness_goal'):
+        find_similar_recipe_parameters["fitness_goal"] = data["fitness_goal"]
+
+
+
+    tdee = calculate_tdee(user.bmr , user.activity_level)
+    similar_recipes = find_similar_recipe(
+        data["recipe_description"],
+        temp_df,
+        tdee,
+        user.weight,
+        find_similar_recipe_parameters["num_recipes"],
+        find_similar_recipe_parameters["min_calories"] ,
+        find_similar_recipe_parameters["max_calories"],
+        find_similar_recipe_parameters["diabetic_friendly"],
+        find_similar_recipe_parameters["fitness_goal"],
+        find_similar_recipe_parameters["max_prep_time"],
+
+
+    )
+    json_df = similar_recipes.to_json(orient='records')
+
+    data_list = json.loads(json_df)
+
+
+    return jsonify({"recipes":data_list}), 200
+
+
 
 
 # Run the application
