@@ -30,6 +30,7 @@ class User(db.Model):
     bmi = db.Column(db.Numeric(5, 2))
     logged_in =db.Column(db.Boolean, default=False)
     activity_level = db.Column(db.String(20), nullable=False)
+    fitness_goal = db.Column(db.String(25), nullable=False)
 
 
 @app.route('/test', methods=['POST'])
@@ -85,7 +86,8 @@ def register():
         bmi=bmi,
         bmr=bmr,
         logged_in =logged_in,
-        activity_level=data["activity_level"]
+        activity_level=data["activity_level"],
+        fitness_goal = data["fitness_goal"]
     )
 
     db.session.add(new_user)
@@ -102,7 +104,8 @@ def register():
         'gender': new_user.gender,
         'bmr': str(new_user.bmr),
         'bmi': str(new_user.bmi),
-        "activity_level": new_user.activity_level
+        "activity_level": new_user.activity_level,
+        'fitness_goal': new_user.fitness_goal,
     }), 201
 
 
@@ -146,6 +149,7 @@ def get_user_profile(user_id):
         'bmr': str(user.bmr),
         'bmi': str(user.bmi),
         "activity_level": user.activity_level,
+        'fitness_goal': user.fitness_goal,
     }), 200
 
 ## 4. Change Password
@@ -182,6 +186,9 @@ def update_profile(user_id):
 
     if data.get('activity_level'):
         user.activity_level = data['activity_level']
+
+    if data.get('fitness_goal'):
+        user.fitness_goal = data['fitness_goal']
 
     if data.get('email'):
         user.email = data['email']
@@ -243,8 +250,6 @@ def ml_model(user_id):
         "max_calories":1000,
         "diabetic_friendly":False,
         "max_prep_time":60,
-        "fitness_goal":None,
-
     }
     if data.get('num_recipes'):
         find_similar_recipe_parameters["num_recipes"] = int(data["num_recipes"])
@@ -261,9 +266,6 @@ def ml_model(user_id):
     if data.get('max_prep_time'):
         find_similar_recipe_parameters["max_prep_time"] = int(data["max_prep_time"])
 
-    if data.get('fitness_goal'):
-        find_similar_recipe_parameters["fitness_goal"] = data["fitness_goal"]
-
 
 
     tdee = calculate_tdee(user.bmr , user.activity_level)
@@ -276,7 +278,7 @@ def ml_model(user_id):
         find_similar_recipe_parameters["min_calories"] ,
         find_similar_recipe_parameters["max_calories"],
         find_similar_recipe_parameters["diabetic_friendly"],
-        find_similar_recipe_parameters["fitness_goal"],
+        user.fitness_goal,
         find_similar_recipe_parameters["max_prep_time"],
 
 
