@@ -1,8 +1,13 @@
+import json
 import pandas as pd
 import os
 from glob import glob
+from flask import request, jsonify
 from sentence_transformers import SentenceTransformer
-from ML_Model.utils import cosine_similarity ,filter_recipes_by_goal
+from ML_Model.utils import cosine_similarity, filter_recipes_by_goal, calculate_tdee
+
+from models import User
+
 
 def init_model():
     # Step 1: Load all Parquet files from folder into a single DataFrame
@@ -19,6 +24,54 @@ def init_model():
 
 
     return df , model
+
+
+def ml_model(user_id):
+    user = User.query.get(user_id)
+    data= request.form.to_dict()
+    temp_df = input_and_execution(data["recipe_description"])
+
+    find_similar_recipe_parameters ={
+        "num_recipes":3,
+        "min_calories":300,
+        "max_calories":1000,
+        "diabetic_friendly":False,
+        "max_prep_time":60,
+    }
+    if data.get('num_recipes'):
+        find_similar_recipe_parameters["num_recipes"] = int(data["num_recipes"])
+
+    if data.get('min_calories'):
+        find_similar_recipe_parameters["min_calories"] =int (data["min_calories"])
+
+    if data.get('max_calories'):
+        find_similar_recipe_parameters["max_calories"] = int(data["max_calories"])
+
+    if data.get('diabetic_friendly'):
+        find_similar_recipe_parameters["diabetic_friendly"] = bool(data["diabetic_friendly"])
+
+    if data.get('max_prep_time'):
+        find_similar_recipe_parameters["max_prep_time"] = int(data["max_prep_time"])
+
+
+    tdee = calculate_tdee(user.bmr , user.activity_level)
+    similar_recipes = find_similar_recipe(
+        data["recipe_description"],
+        temp_df,
+        tdee,
+        user.weight,
+        find_similar_recipe_parameters["num_recipes"],
+        find_similar_recipe_parameters["min_calories"] ,
+        find_similar_recipe_parameters["max_calories"],
+        find_similar_recipe_parameters["diabetic_friendly"],
+        user.fitness_goal,
+        find_similar_recipe_parameters["max_prep_time"],
+    )
+    json_df = similar_recipes.to_json(orient='records')
+    data_list = json.loads(json_df)
+
+    return jsonify({"recipes":data_list}), 200
+
 
 def find_similar_recipe(
         recipe,
@@ -82,7 +135,8 @@ def find_similar_recipe(
 
     return None
 
-def input_and_execution(user_input , df , model):
+def input_and_execution(user_input):
+    from back import df, model
     input_embedding = model.encode([user_input])[0]
 
     # Append the input temporarily if not in dataset
