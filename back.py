@@ -1,4 +1,5 @@
 from flask import Flask
+import psycopg2
 from flask_cors import CORS
 from ML_Model.ml_model import init_model, ml_model
 from user_functions import (register, login, get_user_profile,change_password,
@@ -10,9 +11,14 @@ from user_functions import (register, login, get_user_profile,change_password,
 app = Flask(__name__)
 CORS(app)
 
-# Configure database connection
+
+#postgresql://postgres:123@localhost/Recipe-Rise_DB
+#postgresql://postgres:Zxcvbnm123@postgresql17052025.postgres.database.azure.com:5432/Recipe-Rise_DB
+
+# Configure local database connection
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123@localhost/Recipe-Rise_DB'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 
 from models import User, db
 db.init_app(app)
