@@ -26,3 +26,26 @@ class Chat(db.Model):
     sender = db.Column(db.String(10), nullable=False)
     time_and_date = db.Column(db.DateTime, nullable=False)
     buble_id = db.Column(db.Integer, primary_key=True )
+
+class History(db.Model):
+    __tablename__ = 'entire_recipe_details'
+    recipe_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    date_and_time = db.Column(db.DateTime, nullable=False)
+
+    calories = db.Column(db.Float, nullable=False)
+    carbohydrates_pdv = db.Column(db.Float, nullable=False, name="carbohydrates (PDV)")
+    description = db.Column(db.Text, nullable=False)
+    ingredients = db.Column(db.Text, nullable=False)
+    minutes = db.Column(db.Float, nullable=False)
+    n_ingredients = db.Column(db.Integer, nullable=False)
+    n_steps = db.Column(db.Integer, nullable=False)
+    name = db.Column(db.Text, nullable=False)
+    protein_pdv = db.Column(db.Float, nullable=False, name="protein (PDV)")
+    saturated_fats_pdv = db.Column(db.Float, nullable=False, name="saturated fats (PDV)")
+    similarity = db.Column(db.Float, nullable=False)
+    sodium_pdv = db.Column(db.Float, nullable=False, name="sodium (PDV)")
+    steps = db.Column(db.ARRAY(db.Text), nullable=False)
+    sugar_pdv = db.Column(db.Float, nullable=False, name="sugar (PDV)")
+    total_fats_pdv = db.Column(db.Float, nullable=False, name="total fats (PDV)")
+

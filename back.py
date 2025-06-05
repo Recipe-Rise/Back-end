@@ -1,12 +1,9 @@
-from flask import Flask
-import psycopg2
+from flask import Flask ,request
 from flask_cors import CORS
 from ML_Model.ml_model import init_model, ml_model
 from user_functions import (register, login, get_user_profile,change_password,
                             update_profile, logout
                             )
-
-
 
 app = Flask(__name__)
 CORS(app)
@@ -20,7 +17,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:123@localhost/Rec
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 
-from models import User, db
+from models import db
 db.init_app(app)
 
 df, model = init_model()
@@ -66,7 +63,8 @@ def sign_out(user_id):
 ## 7. Recommendation system
 @app.route('/ml_model/<int:user_id>', methods=['GET'])
 def recommendation_model(user_id):
-    return ml_model(user_id)
+    data = request.form.to_dict()
+    return ml_model(user_id , data)
 
 
 ## 8. upload image
@@ -96,7 +94,23 @@ def get_chat_history(user_id):
     from chat_history import get_chat_bubbles
     return get_chat_bubbles(user_id )
 
+## 12. add recipe to user history
+@app.route('/add_recipe_to_history/<int:user_id>', methods=['POST'])
+def add_recipe_to_user_history(user_id):
+    from recipe_history import add_recipe_to_history
+    return add_recipe_to_history(user_id)
 
+## 13. get user recipes history
+@app.route('/get_user_recipes_history/<int:user_id>', methods=['GET'])
+def get_user_recipes_history(user_id):
+    from recipe_history import get_recipes_history
+    return get_recipes_history(user_id)
+
+## 14. recommend recipe by user history
+@app.route('/recommend_recipe_by_user_history/<int:user_id>', methods=['GET'])
+def recommend_recipe_by_user_history(user_id):
+    from recipe_history import recommend_recipe_by_history
+    return recommend_recipe_by_history(user_id)
 
 
 # Run the application

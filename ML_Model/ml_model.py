@@ -26,9 +26,8 @@ def init_model():
     return df , model
 
 
-def ml_model(user_id):
+def ml_model(user_id ,data):
     user = User.query.get(user_id)
-    data= request.form.to_dict()
     temp_df = input_and_execution(data["recipe_description"])
 
     find_similar_recipe_parameters ={

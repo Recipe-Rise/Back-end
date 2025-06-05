@@ -5,7 +5,6 @@ from models import Chat ,db
 
 def add_chat_buble(user_id):
 
-
     data = request.form.to_dict()
     if not data["chat_buble"] or not data["sender"] :
         return jsonify({'message': 'Data missing'}),400
@@ -33,7 +32,6 @@ def get_chat_bubbles(user_id):
         chat_bubbles = Chat.query.filter_by(user_id=user_id).all()
         if not chat_bubbles:
             return jsonify({"message": "No chat bubbles found for this user."}), 404
-        print(3)
         # Convert the result to a list of dictionaries
         result = []
         for bubble in chat_bubbles:
