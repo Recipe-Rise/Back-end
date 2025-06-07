@@ -49,3 +49,14 @@ class History(db.Model):
     sugar_pdv = db.Column(db.Float, nullable=False, name="sugar (PDV)")
     total_fats_pdv = db.Column(db.Float, nullable=False, name="total fats (PDV)")
 
+class Workout(db.Model):
+    __tablename__ = 'workouts'
+    workout_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    bodyPart = db.Column(db.Text, nullable=False)
+    gifUrl = db.Column(db.Text, nullable=False)
+    name = db.Column(db.Text, nullable=False)
+    target = db.Column(db.Text, nullable=False)
+    secondaryMuscles = db.Column(db.ARRAY(db.Text), nullable=False)
+    instructions = db.Column(db.ARRAY(db.Text), nullable=False)
+    date_and_time = db.Column(db.DateTime, nullable=False)

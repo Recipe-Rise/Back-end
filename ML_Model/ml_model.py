@@ -11,7 +11,7 @@ from models import User
 
 def init_model():
     # Step 1: Load all Parquet files from folder into a single DataFrame
-    folder_path = "C:\\Users\\pc\\Desktop\\Back-end\\Back-end-Bavley\\ML_Model\\data"  # <-- Replace with your actual folder
+    folder_path = ".\\ML_Model\\data"
     all_files = glob(os.path.join(folder_path, "*.parquet"))
     df = pd.concat([pd.read_parquet(f) for f in all_files], ignore_index=True)
     model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')

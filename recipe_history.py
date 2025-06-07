@@ -1,6 +1,5 @@
 import json
-
-from flask import request, jsonify, session
+from flask import request, jsonify
 from models import History ,db
 
 def add_recipe_to_history(user_id):
@@ -54,7 +53,7 @@ def add_recipe_to_history(user_id):
 def get_recipes_history(user_id):
     recipes = History.query.filter_by(user_id=user_id).all()
     if not recipes:
-        return jsonify({"message": "No chat bubbles found for this user."}), 404
+        return jsonify({"message": "No recipe history found for this user."}), 404
     result = []
     for recipe in recipes:
         result.append({
@@ -78,7 +77,6 @@ def get_recipes_history(user_id):
             "total fats (PDV)": recipe.total_fats_pdv,
         })
     return jsonify(result), 200
-
 
 def recommend_recipe_by_history(user_id):
     from ML_Model.ml_model import ml_model

@@ -61,7 +61,7 @@ def sign_out(user_id):
 
 
 ## 7. Recommendation system
-@app.route('/ml_model/<int:user_id>', methods=['GET'])
+@app.route('/ml_model/<int:user_id>', methods=['POST'])
 def recommendation_model(user_id):
     data = request.form.to_dict()
     return ml_model(user_id , data)
@@ -107,10 +107,23 @@ def get_user_recipes_history(user_id):
     return get_recipes_history(user_id)
 
 ## 14. recommend recipe by user history
-@app.route('/recommend_recipe_by_user_history/<int:user_id>', methods=['GET'])
+@app.route('/recommend_recipe_by_user_history/<int:user_id>', methods=['POST'])
 def recommend_recipe_by_user_history(user_id):
     from recipe_history import recommend_recipe_by_history
     return recommend_recipe_by_history(user_id)
+
+## 15. add workout to user history
+@app.route('/add_workout_to_history/<int:user_id>', methods=['POST'])
+def add_workout_to_user_history(user_id):
+    from workouts_history import add_workout_to_history
+    return add_workout_to_history(user_id)
+
+## 16. get user workouts history
+@app.route('/get_user_workouts_history/<int:user_id>', methods=['GET'])
+def get_user_workouts_history(user_id):
+    from workouts_history import get_workouts_history
+    return get_workouts_history(user_id)
+
 
 
 # Run the application
