@@ -60,3 +60,4 @@ class Workout(db.Model):
     secondaryMuscles = db.Column(db.ARRAY(db.Text), nullable=False)
     instructions = db.Column(db.ARRAY(db.Text), nullable=False)
     date_and_time = db.Column(db.DateTime, nullable=False)
+

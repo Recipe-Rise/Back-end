@@ -1,10 +1,12 @@
-from flask import Flask ,request
+from flask import Flask, request
 from flask_cors import CORS
+from dotenv import load_dotenv
+import os
 from ML_Model.ml_model import init_model, ml_model
 from user_functions import (register, login, get_user_profile,change_password,
                             update_profile, logout
                             )
-
+#load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
@@ -124,7 +126,11 @@ def get_user_workouts_history(user_id):
     from workouts_history import get_workouts_history
     return get_workouts_history(user_id)
 
-
+@app.route('/test', methods=['GET'])
+def test():
+    from email_verification import verify_email
+    email = "paula3del@gmail.com"
+    return verify_email(email)
 
 # Run the application
 if __name__ == '__main__':
