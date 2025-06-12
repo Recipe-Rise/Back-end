@@ -1,3 +1,4 @@
+import os
 import re
 import smtplib
 import secrets
@@ -6,8 +7,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from flask import jsonify, request
 from werkzeug.security import generate_password_hash, check_password_hash
-
 from models import User , VerificationCodes , db
+
 
 def send_verification_code():
     data = request.form.to_dict()
@@ -19,8 +20,8 @@ def send_verification_code():
         return jsonify({'message': 'Email is not valid'}), 400
 
     # Email configuration
-    sender_email = "reciperisev@gmail.com"
-    password = "dunejyjgmfjgpjkt"  # For security, consider using environment variables
+    sender_email = os.getenv("SENDER_EMAIL")
+    password = os.getenv("SENDER_EMAIL_PASSWORD")  # For security, consider using environment variables
     from_name = "Recipe Rise"
     receiver_email = data["email"]
     subject = "Email Verification"

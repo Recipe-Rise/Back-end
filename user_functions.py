@@ -9,7 +9,6 @@ def register():
         return jsonify({'message': 'User already exists'}), 409
 
     hashed_password = generate_password_hash(data['password'], method='pbkdf2:sha256')
-    logged_in = True
 
     # Calculate BMI if height and weight are provided
     bmi = None
@@ -40,7 +39,7 @@ def register():
         gender=data.get('gender'),
         bmi=bmi,
         bmr=bmr,
-        logged_in =logged_in,
+
         activity_level=data["activity_level"],
         fitness_goal = data["fitness_goal"]
     )
@@ -69,10 +68,7 @@ def login():
 
     if not user or not check_password_hash(user.password, data['password']):
         return jsonify({'message': 'Invalid credentials'}), 401
-    if user.logged_in:
-        return jsonify({'message': 'user logged in on another device'}), 403
 
-    user.logged_in = True
     db.session.commit()
     return jsonify({
         'message': 'Login successful',
@@ -168,11 +164,3 @@ def update_profile(user_id):
     db.session.commit()
 
     return jsonify({'message': 'Profile updated successfully'}), 200
-
-def logout(user_id):
-    user = User.query.get(user_id)
-    user.logged_in = False
-    db.session.commit()
-
-
-    return jsonify({'message': 'Logged out successfully'}), 200

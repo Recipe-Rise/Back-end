@@ -13,7 +13,6 @@ class User(db.Model):
     gender = db.Column(db.String(20), nullable=False)
     bmr = db.Column(db.Numeric(10, 2))
     bmi = db.Column(db.Numeric(5, 2))
-    logged_in =db.Column(db.Boolean, default=False)
     activity_level = db.Column(db.String(20), nullable=False)
     fitness_goal = db.Column(db.String(25), nullable=False)
     profile_photo = db.Column(db.LargeBinary)
