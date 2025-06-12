@@ -1,4 +1,6 @@
-from flask import Flask, request
+from glob import glob
+
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 from ML_Model.ml_model import init_model, ml_model
