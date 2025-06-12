@@ -15,6 +15,7 @@ fastparquet==2024.11.0
 filelock==3.18.0
 Flask==3.1.1
 flask-cors==6.0.0
+Flask-SQLAlchemy==3.1.1
 fsspec==2025.3.2
 gunicorn==23.0.0
 hf-xet==1.0.5
