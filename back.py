@@ -11,9 +11,6 @@ app = Flask(__name__)
 CORS(app)
 
 
-#postgresql://postgres:123@localhost/Recipe-Rise_DB
-#postgresql://postgres:Zxcvbnm123@postgresql17052025.postgres.database.azure.com:5432/Recipe-Rise_DB
-
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("SQLALCHEMY_DATABASE_URI")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
