@@ -28,6 +28,8 @@ def init_model():
 
 def ml_model(user_id ,data):
     user = User.query.get(user_id)
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
     temp_df = input_and_execution(data["recipe_description"])
 
     find_similar_recipe_parameters ={
