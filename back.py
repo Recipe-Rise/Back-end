@@ -1,12 +1,13 @@
 from flask import Flask, request
 from flask_cors import CORS
-from dotenv import load_dotenv
 import os
 from ML_Model.ml_model import init_model, ml_model
 from user_functions import (register, login, get_user_profile,change_password,
                             update_profile
                             )
-load_dotenv()
+if os.path.exists(".env"):
+    from dotenv import load_dotenv
+    load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
