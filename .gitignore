@@ -12,4 +12,4 @@ __pycache__/
 # Ignore OS or IDE files
 .DS_Store
 *.log
-.idea/.
+.idea/
