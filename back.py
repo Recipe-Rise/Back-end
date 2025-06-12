@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
@@ -126,11 +126,22 @@ def get_user_workouts_history(user_id):
     from workouts_history import get_workouts_history
     return get_workouts_history(user_id)
 
-@app.route('/test', methods=['GET'])
+
+## 17. send verification code
+@app.route('/send_verification_code', methods=['POST'])
+def send_verification_code_method():
+    from email_verification import send_verification_code
+    return send_verification_code()
+
+## 18. verify email
+@app.route('/verify_email', methods=['POST'])
+def verify_email_method():
+    from email_verification import verify_secret_code
+    return verify_secret_code()
+
+@app.route('/test', methods=['POST'])
 def test():
-    from email_verification import verify_email
-    email = "paula3del@gmail.com"
-    return verify_email(email)
+    return jsonify({"message": "deleted"})
 
 # Run the application
 if __name__ == '__main__':

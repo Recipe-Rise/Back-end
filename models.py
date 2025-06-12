@@ -61,3 +61,9 @@ class Workout(db.Model):
     instructions = db.Column(db.ARRAY(db.Text), nullable=False)
     date_and_time = db.Column(db.DateTime, nullable=False)
 
+class VerificationCodes(db.Model):
+    __tablename__ = 'verification_codes'
+    verification_code_id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.Text, nullable=False)
+    code = db.Column(db.Text)
+    tries = db.Column(db.Integer)

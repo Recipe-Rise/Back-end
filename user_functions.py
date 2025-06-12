@@ -1,7 +1,6 @@
 from flask import request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import User ,db
-from email_verification import verify_email
 
 def register():
     data= request.form.to_dict()
