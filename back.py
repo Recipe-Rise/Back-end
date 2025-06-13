@@ -1,5 +1,3 @@
-from glob import glob
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
@@ -20,7 +18,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 from models import db
 db.init_app(app)
 
-df, model = init_model()
+try:
+    df, model = init_model()
+except RuntimeError as e:
+    print(f"Model initialization failed: {e}")
+    df = model = None
 
 # API Endpoints
 

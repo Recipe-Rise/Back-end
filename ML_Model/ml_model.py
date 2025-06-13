@@ -15,7 +15,7 @@ def init_model():
     all_files = glob(os.path.join(folder_path, "*.parquet"))
 
     if not all_files:
-        jsonify({"message": "No data found for ml model"}), 404
+        raise RuntimeError("No data found for ML model")
 
     df = pd.concat([pd.read_parquet(f) for f in all_files], ignore_index=True)
     model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
