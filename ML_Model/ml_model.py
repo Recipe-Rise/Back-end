@@ -11,7 +11,8 @@ from models import User
 
 def init_model():
     # Step 1: Load all Parquet files from folder into a single DataFrame
-    folder_path = ".\\ML_Model\\data"
+    folder_path = os.path.join("ML_Model", "data")
+    print(f"[init_model] Looking for .parquet files in: {os.path.abspath(folder_path)}")
     all_files = glob(os.path.join(folder_path, "*.parquet"))
 
     if not all_files:
