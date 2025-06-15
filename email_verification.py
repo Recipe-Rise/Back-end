@@ -35,20 +35,26 @@ def send_verification_code():
     message["To"] = receiver_email
     message["Subject"] = subject
     message.attach(MIMEText(body, "plain"))
-    new_verification_code = VerificationCodes(
-        email = receiver_email,
-        code = hashed_code,
-        tries = 1
-    )
+
     # Send email
     try:
         with smtplib.SMTP("smtp.gmail.com", 587) as server:
             server.starttls()  # Secure the connection
             server.login(sender_email, password)
             server.sendmail(sender_email, receiver_email, message.as_string())
-            db.session.add(new_verification_code)
+            if not VerificationCodes.query.filter_by(email=data['email']).first():
+                new_verification_code = VerificationCodes(
+                    email=receiver_email,
+                    code=hashed_code,
+                    tries=1
+                )
+                db.session.add(new_verification_code)
+            else:
+                updated_verification_code = VerificationCodes.query.filter_by(email=data['email']).first()
+                updated_verification_code.code = hashed_code
+                updated_verification_code.tries = 1
             db.session.commit()
-        return jsonify({'message': "Email sent successfully!"}), 200
+            return jsonify({'message': "Email sent successfully!"}), 200
     except Exception as e:
         return jsonify({'message': str(e)})
 
